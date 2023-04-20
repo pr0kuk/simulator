@@ -65,7 +65,7 @@ void MapGenerator::generateHeight(int32_t repeat) {
   for (Locus &locus : m_locuses) {
     if ((0.1 * m_xSize < locus.m_x) && (locus.m_x < 0.9 * m_xSize) &&
         (0.1 * m_ySize < locus.m_y) && (locus.m_y < 0.9 * m_ySize) &&
-        QRandomGenerator::global()->bounded(m_locuses.size() / 30) == 0) {
+        QRandomGenerator::global()->bounded(static_cast<double>(m_locuses.size()) / 30) == 0) {
       locus.m_z = 0x80 + (QRandomGenerator::global()->generate() & 0x7f);
       locus.m_fixZ = true;
     } else {
@@ -137,7 +137,7 @@ void MapGenerator::riverGeneration() {
   // River source
   for (Locus &locus : m_locuses) {
     if (!locus.m_fixZ && locus.m_z > 0x40 &&
-        QRandomGenerator::global()->bounded(m_locuses.size() / 50) == 0) {
+        QRandomGenerator::global()->bounded(static_cast<double>(m_locuses.size()) / 50) == 0) {
       locus.m_river = true;
     }
     locus.calcHeightColor();

@@ -12,6 +12,7 @@ private:
   uint32_t m_opcode;
   uint32_t m_r1;
   uint32_t m_r2;
+  uint32_t m_f;
   uint32_t m_r3_imm;
 
 public:
@@ -28,7 +29,7 @@ public:
   std::string assembler(std::stringstream &input);
   std::string disasm();
   std::string dumpRegs(CPU *cpu);
-  uint32_t code();
+  //uint32_t code();
   void decode(uint32_t code);
   void setOpcode(uint32_t opcode) { m_opcode = opcode; }
 };

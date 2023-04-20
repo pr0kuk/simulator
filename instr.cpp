@@ -9,6 +9,7 @@ void Instr::clear() {
   m_opcode = 0;
   m_r1 = 0;
   m_r2 = 0;
+  m_f = 0;
   m_r3_imm = 0;
 }
 
@@ -86,13 +87,45 @@ std::string Instr::dumpRegs(CPU *cpu) {
   return args.str();
 }
 
-uint32_t Instr::code() {
-  return (m_opcode << 24) | (m_r1 << 20) | (m_r2 << 16) | (m_r3_imm & 0xFFFF);
-}
+//uint32_t Instr::code() {
+//  return (m_opcode << 24) | (m_r1 << 20) | (m_r2 << 16) | (m_r3_imm & 0xFFFF);
+//}
 
 void Instr::decode(uint32_t code) {
-  m_opcode = code >> 24;
-  m_r1 = (code >> 20) & 0xF;
-  m_r2 = (code >> 16) & 0xF;
-  m_r3_imm = code & 0xFFFF;
+  m_opcode = code >> 25;
+
+  if (m_opcode == 0x3 || m_opcode == 0x13) {
+  // [i] 0000011 | 0010011
+  m_r1 = (code >> 20) & 0x1F; //rd
+  m_r2 = (code >> 12) & 0x1F;
+  m_f = (code >> 17) & 0x3;
+  m_r3_imm = (code & 0xFFF);
+  m_opcode |= m_f << 7;
+  }
+  if (m_opcode == 0x23) {
+  // [s] // 0100011
+  m_r3_imm = ((code >> 5) & 0x3F) | (((code >> 20) & 0x3F) << 6);
+  m_r1 = (code >> 12) & 0x1F;
+  m_r2 = (code >> 7) & 0x1F;
+  m_f = (code >> 17) & 0x3;
+  m_opcode |= m_f << 7;
+  }
+  if (m_opcode == 0x37) {
+  // [u] 0110111
+  m_r3_imm = (code & 0xFFFFF);
+  m_r1 = (code >> 20) & 0x1F; //rd
+  }
+  if (m_opcode == 0x63) {
+  // [b] op = 1100011
+  m_r1 = (code >> 12) & 0x1F;
+  m_r2 = (code >> 7) & 0x1F;
+  m_f = (code >> 17) & 0x3;
+  m_opcode |= m_f << 7;
+  m_r3_imm = (code & 0x1) | ((code >> 1) & 0x3F << 1) | ((code>>20)&0xF << (6+1)) | (((code>>24)&0x1) << (1+6+4));
+  }
+  if (m_opcode == 0x6F) {
+  // [J] 1101111
+  m_r1 = (code >> 20) & 0x1F; //rd
+  m_r3_imm = (code & 0x1) | ((code >> 1) & 0x3FF << 1) | ((code>>11)&0x1 << (10+1)) | (((code>>12)&0xFF) << (1+10+1));
+  }
 }

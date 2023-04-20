@@ -128,7 +128,7 @@ void CPU::readInstrs(QString input_string) {
                   QString::fromStdString(label));
           return;
         }
-        m_mem[mem] = instr.code();
+        //m_mem[mem] = instr.code();
       } catch (std::invalid_argument const &) {
         showMsg(QString("[ERROR] invalid instruction ") + QString::number(mem));
         return;
